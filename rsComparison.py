@@ -202,20 +202,26 @@ def testContentBased(dataset, itemsContents):
     testContentPrediction(testUsers, meanRatingsPerUser, itemsContents, itemRatingsPerUser)
 
 def identicalSamplesTest(dataset, itemsContents):
+    print("Testing recommender systems on same sample set:")
     users = list(dataset.userId.unique())
     testUsers = random.sample(users, 500)
     itemRatingsPerUser = extractItemRatingsPerUser(dataset)
     testItems = [list(usersItemRatings.keys())[0] for usersItemRatings in [itemRatingsPerUser[user] for user in testUsers]]
     meanRatingsPerUser = pd.DataFrame(dataset.groupby('userId')['rating'].mean())
     meanRatingsPerUser.rename(columns={'rating': 'meanRating'}, inplace=True)
+
+    print("Running test of User-User CF on identical data.")
     testCF(testUsers, users, meanRatingsPerUser, itemRatingsPerUser, ratedBySamples=testItems)
 
     items = list(dataset.itemId.unique())
     meanRatingsPerItem = pd.DataFrame(dataset.groupby('itemId')['rating'].mean())
     meanRatingsPerItem.rename(columns={'rating': 'meanRating'}, inplace=True)
     userRatingsPerItem = extractUserRatingsPerItem(dataset)
+
+    print("Running test of Item-Item CF on identical data.")
     testCF(testItems, items, meanRatingsPerItem, userRatingsPerItem, ratedBySamples=testUsers)
 
+    print("Running test of Content based recommendation on identical data.")
     testContentPrediction(testUsers, meanRatingsPerUser, itemsContents, itemRatingsPerUser, testItems=testItems)
 
 
